@@ -1,6 +1,6 @@
 import {faker} from "@faker-js/faker";
 import * as fs from 'fs';
-import {Hotel} from './types.js';
+import type {Hotel} from './types.js';
 
 const generateHotelData = (count:number):Hotel[] => {
     const hotels :Hotel[] = [];

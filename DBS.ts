@@ -1,6 +1,6 @@
-import { Hotel } from "./types.js";
+import type { Hotel } from "./types.js";
 import * as fs from "fs";
-import { Filters } from "./types.js";
+import type { Filters } from "./types.js";
 
 class HotelDB {
     private hotels: Hotel[];
@@ -12,34 +12,29 @@ class HotelDB {
 
     public searchByFilter(filter:Filters): Hotel[]{
         let rst = this.hotels.filter((hotel) => {            
-            if(filter.name)
-                return hotel.name.toLowerCase().includes(filter.name.toLowerCase());
-            return hotel;
-        }).filter((hotel) => {
-            if(filter.city)
-                return hotel.city.toLowerCase().includes(filter.city.toLowerCase());
-            return hotel
-        }).filter((hotel) => {
-            if(filter.price){
-                if (filter.price.min && filter.price.max)
-                    return hotel.price<=filter.price.max && hotel.price >= filter.price.min;
-                else if(filter.price.min && ! filter.price.max)
-                    return hotel.price >= filter.price.min;
-                else if(! filter.price.min && filter.price.max)
-                    return hotel.price <= filter.price.max;
-            }
-            return hotel;
-        }).filter((hotel) => {
-            if(filter.stars){
-                if (filter.stars.min && filter.stars.max)
-                    return hotel.stars<=filter.stars.max && hotel.stars >= filter.stars.min;
-                else if(filter.stars.min && ! filter.stars.max)
-                    return hotel.stars >= filter.stars.min;
-                else if(! filter.stars.min && filter.stars.max)
-                    return hotel.stars <= filter.stars.max;
-            }
-            return hotel;
-        }).slice(0,5)
+            if (filter.name && !hotel.name.toLowerCase().includes(filter.name.toLowerCase())) {
+            return false;
+        }
+
+        if (filter.city && !hotel.city.toLowerCase().includes(filter.city.toLowerCase())) {
+            return false;
+        }
+
+        if (filter.price) {
+            const min = filter.price.min ?? 0;
+            const max = filter.price.max ?? Number.MAX_SAFE_INTEGER;
+            if (hotel.price < min || hotel.price > max) return false;
+        }
+
+        if (filter.stars) {
+            const min = filter.stars.min ?? 0;
+            const max = filter.stars.max ?? 5;
+            if (hotel.stars < min || hotel.stars > max) return false;
+        }
+
+        return true;
+        }).slice(0,5);
+        console.log(`number of hotels found: ${rst.length}`)
         return rst;
     }
 }
