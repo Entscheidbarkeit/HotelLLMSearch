@@ -1,4 +1,4 @@
-import type {Filters} from "./types.js";
+import type {Filters} from "./types/types.js";
 import {hotelDBS} from "./DBS.js";
 import express, {type Request,type Response}  from "express";
 import axios from "axios"
@@ -12,7 +12,7 @@ app.use(express.json())
 
 app.post("/api/ask", async (req:Request, res:Response) => {
     const { query } = req.body;
-    console.log(`query received. ${req.body}`)
+    console.log("query received:" ,req.body)
     console.log("DEBUG: Received body ->", JSON.stringify(req.body, null, 2));
     if(!query){
         return res.status(400).json({error: "Query is required"})
@@ -31,6 +31,10 @@ app.post("/api/ask", async (req:Request, res:Response) => {
                         "minStars": number,
                         "maxStars": number
                         }
+                        ### RULES ###
+                        - price: if user mentions a range (e.g., "200 to 500"), extract it. 
+                        - price: if user says "around 200", use min:150, max:250.
+                        - stars: if not mentioned, use min:0, max:5.
 
                         ### EXAMPLE ###
                         User: "Looking for a Hilton in Berlin under 300 Euro"
@@ -57,7 +61,7 @@ app.post("/api/ask", async (req:Request, res:Response) => {
         const aiRes = aiRst.data.response;
         console.log(`ai response: ${aiRes}`)
         let filter = extractFilterJSON(aiRes);
-        console.log(`filter extracted: ${filter}`)
+        console.log("filter extracted:" ,filter)
 
         let searchRst = hotelDBS.searchByFilter(filter)
         res.json({
@@ -99,8 +103,8 @@ function extractFilterJSON(msg:string):Filters{
         const rawJson = JSON.parse(msg);
         
         return {
-            name: rawJson.name || undefined,
-            city: rawJson.city || undefined,
+            name: rawJson.name || null,
+            city: rawJson.city || null,
             price: { 
                 min: Number(rawJson.minPrice) || 0, 
                 max: Number(rawJson.maxPrice) || 9999 

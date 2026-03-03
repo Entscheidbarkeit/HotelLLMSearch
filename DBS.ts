@@ -1,6 +1,6 @@
-import type { Hotel } from "./types.js";
+import type { Hotel } from "./types/types.js";
 import * as fs from "fs";
-import type { Filters } from "./types.js";
+import type { Filters } from "./types/types.js";
 
 class HotelDB {
     private hotels: Hotel[];
@@ -39,4 +39,4 @@ class HotelDB {
     }
 }
 
-export const hotelDBS = new HotelDB("../hotelsData");
+export const hotelDBS = new HotelDB("../hotelsData_2");
